@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/res/resources.dart';
-import 'package:flutter_deer/util/image_utils.dart';
 
 class StoreSelectTextItem extends StatelessWidget {
 
@@ -9,8 +8,8 @@ class StoreSelectTextItem extends StatelessWidget {
     Key key,
     this.onTap,
     @required this.title,
-    this.content: "",
-    this.textAlign: TextAlign.start,
+    this.content = '',
+    this.textAlign = TextAlign.start,
     this.style
   }): super(key: key);
 
@@ -29,33 +28,25 @@ class StoreSelectTextItem extends StatelessWidget {
         margin: const EdgeInsets.only(right: 8.0, left: 16.0),
         width: double.infinity,
         decoration: BoxDecoration(
-            border: Border(
-              bottom: Divider.createBorderSide(context, color: Colours.line, width: 0.6),
-            )
+          border: Border(
+            bottom: Divider.createBorderSide(context, width: 0.6),
+          ),
         ),
         child: Row(
           children: <Widget>[
-            Text(
-              title,
-              style: TextStyles.textDark14,
-            ),
+            Text(title),
+            Gaps.hGap16,
             Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0, left: 16.0),
-                child: Text(
-                  content,
-                  maxLines: 2,
-                  textAlign: textAlign,
-                  overflow: TextOverflow.ellipsis,
-                  style: style ?? TextStyles.textDark14,
-                ),
+              child: Text(
+                content,
+                maxLines: 2,
+                textAlign: textAlign,
+                overflow: TextOverflow.ellipsis,
+                style: style
               ),
             ),
-            loadAssetImage("ic_arrow_right",
-              height: 16.0,
-              width: 16.0,
-            )
+            Gaps.hGap8,
+            Images.arrowRight
           ],
         ),
       ),

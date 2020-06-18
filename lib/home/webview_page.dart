@@ -31,28 +31,27 @@ class _WebViewPageState extends State<WebViewPage> {
         builder: (context, snapshot) {
           return WillPopScope(
             onWillPop: () async {
-              if (snapshot.hasData){
-                bool canGoBack = await snapshot.data.canGoBack();
-                if (canGoBack){
+              if (snapshot.hasData) {
+                var canGoBack = await snapshot.data.canGoBack();
+                if (canGoBack) {
                   // 网页可以返回时，优先返回上一页
-                  snapshot.data.goBack();
+                  await snapshot.data.goBack();
                   return Future.value(false);
                 }
-                return Future.value(true);
               }
               return Future.value(true);
             },
             child: Scaffold(
-                appBar: MyAppBar(
-                  centerTitle: widget.title,
-                ),
-                body: WebView(
-                  initialUrl: widget.url,
-                  javascriptMode: JavascriptMode.unrestricted,
-                  onWebViewCreated: (WebViewController webViewController) {
-                    _controller.complete(webViewController);
-                  },
-                )
+              appBar: MyAppBar(
+                centerTitle: widget.title,
+              ),
+              body: WebView(
+                initialUrl: widget.url,
+                javascriptMode: JavascriptMode.unrestricted,
+                onWebViewCreated: (WebViewController webViewController) {
+                  _controller.complete(webViewController);
+                },
+              )
             ),
           );
         }

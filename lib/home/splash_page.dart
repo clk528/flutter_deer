@@ -6,10 +6,11 @@ import 'package:flutter_deer/common/common.dart';
 import 'package:flutter_deer/login/login_router.dart';
 import 'package:flutter_deer/routers/fluro_navigator.dart';
 import 'package:flutter_deer/util/image_utils.dart';
-import 'package:flutter_deer/util/utils.dart';
+import 'package:flutter_deer/util/theme_utils.dart';
+import 'package:flutter_deer/widgets/load_image.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:common_utils/common_utils.dart';
-import 'package:flukit/flukit.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flustars/flustars.dart';
 
 class SplashPage extends StatefulWidget {
@@ -20,104 +21,84 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> {
 
   int _status = 0;
-  List<String> _guideList = [
-    "app_start_1",
-    "app_start_2",
-    "app_start_3",
-  ];
-  List<Widget> _bannerList = new List();
+  final List<String> _guideList = ['app_start_1', 'app_start_2', 'app_start_3'];
   StreamSubscription _subscription;
-  
+
   @override
   void initState() {
     super.initState();
-    _initSplash();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      /// 两种初始化方案，另一种见 main.dart
+      /// 两种方法各有优劣
+      await SpUtil.getInstance();
+      if (SpUtil.getBool(Constant.keyGuide, defValue: true)) {
+        /// 预先缓存图片，避免直接使用时因为首次加载造成闪动
+        _guideList.forEach((image) {
+          precacheImage(ImageUtils.getAssetImage(image), context);
+        });
+      }
+      _initSplash();
+    });
   }
-  
+
   @override
   void dispose() {
     _subscription?.cancel();
     super.dispose();
   }
-  
-  void _initAsync() async {
-    await SpUtil.getInstance();
-    if (SpUtil.getBool(Constant.key_guide, defValue: true)) {
-      SpUtil.putBool(Constant.key_guide, false);
-      _initGuide();
-    } else {
-      _goLogin();
-    }
-  }
 
   void _initGuide() {
-    _initBannerData();
     setState(() {
       _status = 1;
     });
   }
-  
-  void _initSplash(){
-    _subscription = Observable.just(1).delay(Duration(milliseconds: 2000)).listen((_){
-      _initAsync();
+
+  void _initSplash() {
+    _subscription = Stream.value(1).delay(Duration(milliseconds: 1500)).listen((_) {
+      if (SpUtil.getBool(Constant.keyGuide, defValue: true)) {
+        SpUtil.putBool(Constant.keyGuide, false);
+        _initGuide();
+      } else {
+        _goLogin();
+      }
     });
   }
-  
-  _goLogin(){
+
+  void _goLogin() {
     NavigatorUtils.push(context, LoginRouter.loginPage, replace: true);
   }
 
-  void _initBannerData() {
-    for (int i = 0, length = _guideList.length; i < length; i++) {
-      if (i == length - 1) {
-        _bannerList.add(InkWell(
-          onTap: (){
-            _goLogin();
-          },
-          child: loadAssetImage(
-            _guideList[i],
-            fit: BoxFit.fill,
-            width: double.infinity,
-            height: double.infinity,
-          ),
-        ));
-      } else {
-        _bannerList.add(loadAssetImage(
-          _guideList[i],
-          fit: BoxFit.fill,
-          width: double.infinity,
-          height: double.infinity,
-        ));
-      }
-    }
-  }
-  
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Stack(
-        children: <Widget>[
-          Offstage(
-            offstage: !(_status == 0),
-            child: Image.asset(
-              Utils.getImgPath("start_page", format: "jpg"),
-              width: double.infinity,
-              fit: BoxFit.fill,
-              height: double.infinity,
-            ),
-          ),
-          Offstage(
-            offstage: !(_status == 1),
-            child: ObjectUtil.isEmpty(_bannerList) 
-                ? Container() 
-                : Swiper(
-                autoStart: false,
-                circular: false,
-                indicator: null,
-                children: _bannerList),
-          )
-        ],
-      ),
+      color: ThemeUtils.getBackgroundColor(context),
+      child: _status == 0 ? 
+      FractionallyAlignedSizedBox(
+        heightFactor: 0.3,
+        widthFactor: 0.33,
+        leftFactor: 0.33,
+        bottomFactor: 0,
+        child: const LoadAssetImage('logo')
+      ) :
+      Swiper(
+        key: const Key('swiper'),
+        itemCount: _guideList.length,
+        loop: false,
+        itemBuilder: (_, index) {
+          return LoadAssetImage(
+            _guideList[index],
+            key: Key(_guideList[index]),
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          );
+        },
+        onTap: (index) {
+          if (index == _guideList.length - 1) {
+            _goLogin();
+          }
+        },
+      )
     );
   }
 }
