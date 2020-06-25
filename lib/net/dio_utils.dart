@@ -116,30 +116,21 @@ class DioUtils {
 
   Future requestNetwork<T>(Method method, String url, {
     NetSuccessCallback<T> onSuccess,
-    NetSuccessListCallback<T> onSuccessList,
     NetErrorCallback onError,
     dynamic params, 
     Map<String, dynamic> queryParameters,
     CancelToken cancelToken, 
     Options options, 
-    bool isList = false,
   }) {
-    final String m = _getRequestMethod(method);
-    return _request<T>(m, url,
+    return _request<T>(method.value, url,
       data: params,
       queryParameters: queryParameters,
       options: options,
       cancelToken: cancelToken,
     ).then((BaseEntity<T> result) {
       if (result.code == 0) {
-        if (isList) {
-          if (onSuccessList != null) {
-            onSuccessList(result.listData);
-          }
-        } else {
-          if (onSuccess != null) {
-            onSuccess(result.data);
-          }
+        if (onSuccess != null) {
+          onSuccess(result.data);
         }
       } else {
         _onError(result.code, result.message, onError);
@@ -154,16 +145,13 @@ class DioUtils {
   /// 统一处理(onSuccess返回T对象，onSuccessList返回 List<T>)
   void asyncRequestNetwork<T>(Method method, String url, {
     NetSuccessCallback<T> onSuccess,
-    NetSuccessListCallback<T> onSuccessList,
     NetErrorCallback onError,
     dynamic params, 
     Map<String, dynamic> queryParameters, 
     CancelToken cancelToken, 
     Options options, 
-    bool isList = false,
   }) {
-    final String m = _getRequestMethod(method);
-    Stream.fromFuture(_request<T>(m, url,
+    Stream.fromFuture(_request<T>(method.value, url,
       data: params,
       queryParameters: queryParameters,
       options: options,
@@ -171,14 +159,8 @@ class DioUtils {
     )).asBroadcastStream()
         .listen((result) {
       if (result.code == 0) {
-        if (isList) {
-          if (onSuccessList != null) {
-            onSuccessList(result.listData);
-          }
-        } else {
-          if (onSuccess != null) {
-            onSuccess(result.data);
-          }
+        if (onSuccess != null) {
+          onSuccess(result.data);
         }
       } else {
         _onError(result.code, result.message, onError);
@@ -206,31 +188,6 @@ class DioUtils {
       onError(code, msg);
     }
   }
-
-  String _getRequestMethod(Method method) {
-    String m;
-    switch(method) {
-      case Method.get:
-        m = 'GET';
-        break;
-      case Method.post:
-        m = 'POST';
-        break;
-      case Method.put:
-        m = 'PUT';
-        break;
-      case Method.patch:
-        m = 'PATCH';
-        break;
-      case Method.delete:
-        m = 'DELETE';
-        break;
-      case Method.head:
-        m = 'HEAD';
-        break;
-    }
-    return m;
-  }
 }
 
 Map<String, dynamic> parseData(String data) {
@@ -244,4 +201,10 @@ enum Method {
   patch,
   delete,
   head
+}
+
+/// 使用拓展枚举替代 switch判断取值
+/// https://zhuanlan.zhihu.com/p/98545689
+extension MethodExtension on Method {
+  String get value => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'][this.index];
 }
