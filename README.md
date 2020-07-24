@@ -61,7 +61,7 @@ iOS需要自行下载代码运行。
 
 [![Build Status](https://github.com/simplezhli/flutter_deer/workflows/flutter_deer%20driver/badge.svg?branch=master)](https://github.com/simplezhli/flutter_deer/actions?query=workflow%3A%22flutter_deer+driver%22+branch%3Amaster)
 
-    1. Flutter version 1.17.3
+    1. Flutter version 1.17.5
      
     2. Dart version 2.8.4
 
@@ -96,6 +96,8 @@ iOS需要自行下载代码运行。
 - [说说Flutter中的Semantics](https://weilu.blog.csdn.net/article/details/103823259)
 
 - [说说Flutter中最熟悉的陌生人 —— Key](https://weilu.blog.csdn.net/article/details/104745624)
+
+- [说说Flutter中的无名英雄 —— Focus](https://weilu.blog.csdn.net/article/details/107132031)
 
 - [Flutter性能优化实践 —— UI篇](https://weilu.blog.csdn.net/article/details/106046434)
 

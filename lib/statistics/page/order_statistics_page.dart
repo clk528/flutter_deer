@@ -4,11 +4,11 @@ import 'dart:math';
 import 'package:common_utils/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/res/resources.dart';
-import 'package:flutter_deer/statistics/widgets/selected_text.dart';
+import 'package:flutter_deer/statistics/widgets/selected_date.dart';
 import 'package:flutter_deer/util/date_utils.dart';
 import 'package:flutter_deer/util/image_utils.dart';
 import 'package:flutter_deer/util/theme_utils.dart';
-import 'package:flutter_deer/widgets/app_bar.dart';
+import 'package:flutter_deer/widgets/my_app_bar.dart';
 import 'package:flutter_deer/widgets/load_image.dart';
 import 'package:flutter_deer/widgets/my_card.dart';
 import 'package:flutter_deer/widgets/bezier_chart/bezier_chart.dart';
@@ -296,7 +296,7 @@ class _OrderStatisticsPageState extends State<OrderStatisticsPage> with TickerPr
         Center(
           child: SelectedDate(
             day.day.toString().padLeft(2, '0'), // 不足2位左边补0
-            selected:(day.day == _selectedDay.day && !DateUtils.isExtraDay(day, _initialDay)),
+            selected: day.day == _selectedDay.day && !DateUtils.isExtraDay(day, _initialDay),
             // 不是本月的日期与超过当前日期的不可点击
             enable: day.day <= _initialDay.day && !DateUtils.isExtraDay(day, _initialDay),
             unSelectedTextColor: _unSelectedTextColor,

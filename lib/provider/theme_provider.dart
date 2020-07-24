@@ -1,26 +1,26 @@
 import 'dart:ui';
 
-import 'package:flustars/flustars.dart';
+import 'package:sp_util/sp_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/common/common.dart';
 import 'package:flutter_deer/res/resources.dart';
 
-class ThemeProvider extends ChangeNotifier {
+extension ThemeModeExtension on ThemeMode {
+  String get value => ['System', 'Light', 'Dark'][index];
+}
 
-  static const Map<ThemeMode, String> themes = {
-    ThemeMode.dark: 'Dark', ThemeMode.light : 'Light', ThemeMode.system : 'System'
-  };
+class ThemeProvider extends ChangeNotifier {
   
   void syncTheme() {
     final String theme = SpUtil.getString(Constant.theme);
-    if (theme.isNotEmpty && theme != themes[ThemeMode.system]) {
+    if (theme.isNotEmpty && theme != ThemeMode.system.value) {
       notifyListeners();
     }
   }
 
   void setTheme(ThemeMode themeMode) {
-    SpUtil.putString(Constant.theme, themes[themeMode]);
+    SpUtil.putString(Constant.theme, themeMode.value);
     notifyListeners();
   }
 
