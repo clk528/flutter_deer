@@ -5,7 +5,7 @@ import 'package:flutter_deer/util/theme_utils.dart';
 
 /// 博客：https://weilu.blog.csdn.net/article/details/107132031
 class FocusDemoPage extends StatefulWidget {
-  const FocusDemoPage({Key key, this.title}) : super(key: key);
+  const FocusDemoPage({super.key, required this.title});
 
   final String title;
 
@@ -26,19 +26,19 @@ class _FocusDemoPageState extends State<FocusDemoPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('${widget.title} build');
+    debugPrint('${widget.title} build');
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: ThemeUtils.isDark(context) ? Colours.dark_bg_color : Colors.blue,
+        backgroundColor: context.isDark ? Colours.dark_bg_color : Colors.blue,
         title: Text(widget.title),
       ),
       body: Column(
-        children: [
+        children: <Widget>[
           TextField(
             focusNode: _focusNode,
           ),
-          FlatButton(
-            child: Text('打印FocusTree'),
+          OutlinedButton(
+            child: const Text('打印FocusTree'),
             onPressed: () {
               // 关闭软键盘四种方式
 //              SystemChannels.textInput.invokeMethod('TextInput.hide');
@@ -51,13 +51,13 @@ class _FocusDemoPageState extends State<FocusDemoPage> {
               });
             },
           ),
-          FlatButton(
-            child: Text('Push TestPage'),
+          ElevatedButton(
+            child: const Text('Push TestPage'),
             onPressed: () {
               Navigator.push<FocusDemoPage>(
                 context,
                 MaterialPageRoute<FocusDemoPage>(
-                  builder: (BuildContext context) => FocusDemoPage(title: 'Test Page'),
+                  builder: (BuildContext context) => const FocusDemoPage(title: 'Test Page'),
                 ),
               );
             },

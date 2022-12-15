@@ -1,15 +1,15 @@
 
 import 'dart:convert' as convert;
 import 'package:common_utils/common_utils.dart';
-import 'package:flutter_deer/common/common.dart';
+import 'package:flutter_deer/res/constant.dart';
 
 /// 输出Log工具类
 class Log {
 
   static const String tag = 'DEER-LOG';
-  
+
   static void init() {
-    LogUtil.init(isDebug: !Constant.inProduction);
+    LogUtil.init(isDebug: !Constant.inProduction, maxLen: 512);
   }
 
   static void d(String msg, {String tag = tag}) {
@@ -26,37 +26,46 @@ class Log {
 
   static void json(String msg, {String tag = tag}) {
     if (!Constant.inProduction) {
-      final dynamic data = convert.json.decode(msg);
-      if (data is Map) {
-        _printMap(data);
-      } else if (data is List) {
-        _printList(data);
-      } else
-        LogUtil.v(msg, tag: tag);
+      try {
+        final dynamic data = convert.json.decode(msg);
+        if (data is Map) {
+          _printMap(data);
+        } else if (data is List) {
+          _printList(data);
+        } else {
+          LogUtil.v(msg, tag: tag);
+        }
+      } catch(e) {
+        LogUtil.e(msg, tag: tag);
+      }
     }
   }
 
   // https://github.com/Milad-Akarie/pretty_dio_logger
-  static void _printMap(Map data, {String tag = tag, int tabs = 1, bool isListItem = false, bool isLast = false}) {
+  static void _printMap(Map<dynamic, dynamic> data, {String tag = tag, int tabs = 1, bool isListItem = false, bool isLast = false}) {
     final bool isRoot = tabs == 1;
     final String initialIndent = _indent(tabs);
     tabs++;
 
-    if (isRoot || isListItem) LogUtil.v('$initialIndent{', tag: tag);
+    if (isRoot || isListItem) {
+      LogUtil.v('$initialIndent{', tag: tag);
+    }
 
-    data.keys.toList().asMap().forEach((index, key) {
+    data.keys.toList().asMap().forEach((index, dynamic key) {
       final bool isLast = index == data.length - 1;
-      var value = data[key];
-      if (value is String) value = '\"$value\"';
+      dynamic value = data[key];
+      if (value is String) {
+        value = '"$value"';
+      }
       if (value is Map) {
-        if (value.length == 0)
+        if (value.isEmpty) {
           LogUtil.v('${_indent(tabs)} $key: $value${!isLast ? ',' : ''}', tag: tag);
-        else {
+        } else {
           LogUtil.v('${_indent(tabs)} $key: {', tag: tag);
           _printMap(value, tabs: tabs);
         }
       } else if (value is List) {
-        if (value.length == 0) {
+        if (value.isEmpty || value.length > 50) {
           LogUtil.v('${_indent(tabs)} $key: ${value.toString()}', tag: tag);
         } else {
           LogUtil.v('${_indent(tabs)} $key: [', tag: tag);
@@ -72,11 +81,11 @@ class Log {
     LogUtil.v('$initialIndent}${isListItem && !isLast ? ',' : ''}', tag: tag);
   }
 
-  static void _printList(List list, {String tag = tag, int tabs = 1}) {
-    list.asMap().forEach((i, e) {
+  static void _printList(List<dynamic> list, {String tag = tag, int tabs = 1}) {
+    list.asMap().forEach((i, dynamic e) {
       final bool isLast = i == list.length - 1;
       if (e is Map) {
-        if (e.length == 0) {
+        if (_canFlattenMap(e, list)) {
           LogUtil.v('${_indent(tabs)}  $e${!isLast ? ',' : ''}', tag: tag);
         } else {
           _printMap(e, tabs: tabs + 1, isListItem: true, isLast: isLast);
@@ -85,6 +94,12 @@ class Log {
         LogUtil.v('${_indent(tabs + 2)} $e${isLast ? '' : ','}', tag: tag);
       }
     });
+  }
+
+  /// 避免一秒内输出过多行数的日志被限制显示
+  /// Single process limit 250/s drop 66 lines.
+  static bool _canFlattenMap(Map<dynamic, dynamic> map, List<dynamic> list) {
+    return list.length * map.length > 100;
   }
 
   static String _indent([int tabCount = 1]) => '  ' * tabCount;

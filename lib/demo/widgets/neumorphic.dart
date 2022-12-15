@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 
 /// https://medium.com/flutter-community/neumorphic-designs-in-flutter-eab9a4de2059
 class NeumorphicContainer extends StatefulWidget {
+
+  NeumorphicContainer({
+    super.key,
+    required this.child,
+    this.bevel = 10.0,
+    this.color,
+  })  : blurOffset = Offset(bevel / 2, bevel / 2);
+
   final Widget child;
   final double bevel;
   final Offset blurOffset;
-  final Color color;
-
-  NeumorphicContainer({
-    Key key,
-    this.child,
-    this.bevel = 10.0,
-    this.color,
-  })  : this.blurOffset = Offset(bevel / 2, bevel / 2),
-        super(key: key);
+  final Color? color;
 
   @override
   _NeumorphicContainerState createState() => _NeumorphicContainerState();
@@ -38,7 +38,7 @@ class _NeumorphicContainerState extends State<NeumorphicContainer> {
 
   @override
   Widget build(BuildContext context) {
-    final color = this.widget.color ?? Colors.blueGrey.shade200;
+    final Color color = widget.color ?? Colors.blueGrey.shade200;
 
     return Listener(
       onPointerDown: _onPointerDown,
@@ -51,15 +51,15 @@ class _NeumorphicContainerState extends State<NeumorphicContainer> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              _isPressed ? color : color.mix(Colors.black, .1),
-              _isPressed ? color.mix(Colors.black, .05) : color,
-              _isPressed ? color.mix(Colors.black, .05) : color,
+            colors: <Color>[
+              if (_isPressed) color else color.mix(Colors.black, .1),
+              if (_isPressed) color.mix(Colors.black, .05) else color,
+              if (_isPressed) color.mix(Colors.black, .05) else color,
               color.mix(Colors.white, _isPressed ? .2 : .5),
             ],
-            stops: [0.0, .3, .6, 1.0,],
+            stops: const <double>[0.0, 0.3, 0.6, 1.0],
           ),
-          boxShadow: _isPressed ? null : [
+          boxShadow: _isPressed ? null : <BoxShadow>[
             BoxShadow(
               blurRadius: widget.bevel,
               offset: -widget.blurOffset,
@@ -80,6 +80,6 @@ class _NeumorphicContainerState extends State<NeumorphicContainer> {
 
 extension ColorUtils on Color {
   Color mix(Color another, double amount) {
-    return Color.lerp(this, another, amount);
+    return Color.lerp(this, another, amount)!;
   }
 }

@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -10,20 +9,20 @@ import 'package:flutter_deer/widgets/state_layout.dart';
 class DeerListView extends StatefulWidget {
 
   const DeerListView({
-    Key key,
-    @required this.itemCount,
-    @required this.itemBuilder,
-    @required this.onRefresh,
+    super.key,
+    required this.itemCount,
+    required this.itemBuilder,
+    required this.onRefresh,
     this.loadMore,
     this.hasMore = false,
     this.stateType = StateType.empty,
     this.pageSize = 10,
     this.padding,
     this.itemExtent,
-  }): super(key: key);
+  });
 
   final RefreshCallback onRefresh;
-  final LoadMoreCallback loadMore;
+  final LoadMoreCallback? loadMore;
   final int itemCount;
   final bool hasMore;
   final IndexedWidgetBuilder itemBuilder;
@@ -31,8 +30,8 @@ class DeerListView extends StatefulWidget {
   /// 一页的数量，默认为10
   final int pageSize;
   /// padding属性使用时注意会破坏原有的SafeArea，需要自行计算bottom大小
-  final EdgeInsetsGeometry padding;
-  final double itemExtent;
+  final EdgeInsetsGeometry? padding;
+  final double? itemExtent;
 
   @override
   _DeerListViewState createState() => _DeerListViewState();
@@ -48,7 +47,7 @@ class _DeerListViewState extends State<DeerListView> {
   
   @override
   Widget build(BuildContext context) {
-    Widget child = RefreshIndicator(
+    final Widget child = RefreshIndicator(
       onRefresh: widget.onRefresh,
       child: widget.itemCount == 0 ? 
       StateLayout(type: widget.stateType) : 
@@ -67,7 +66,7 @@ class _DeerListViewState extends State<DeerListView> {
       ),
     );
     return SafeArea(
-      child: NotificationListener(
+      child: NotificationListener<ScrollNotification>(
         onNotification: (ScrollNotification note) {
           /// 确保是垂直方向滚动，且滑动至底部
           if (note.metrics.pixels == note.metrics.maxScrollExtent && note.metrics.axis == Axis.vertical) {
@@ -91,7 +90,7 @@ class _DeerListViewState extends State<DeerListView> {
       return;
     }
     _isLoading = true;
-    await widget.loadMore();
+    await widget.loadMore?.call();
     _isLoading = false;
   }
 
@@ -99,7 +98,7 @@ class _DeerListViewState extends State<DeerListView> {
 
 class MoreWidget extends StatelessWidget {
   
-  const MoreWidget(this.itemCount, this.hasMore, this.pageSize);
+  const MoreWidget(this.itemCount, this.hasMore, this.pageSize, {super.key});
 
   final int itemCount;
   final bool hasMore;
@@ -107,12 +106,11 @@ class MoreWidget extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    final TextStyle style = ThemeUtils.isDark(context) ? TextStyles.textGray14 : const TextStyle(color: Color(0x8A000000));
+    final TextStyle style = context.isDark ? TextStyles.textGray14 : const TextStyle(color: Color(0x8A000000));
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           if (hasMore) const CupertinoActivityIndicator(),
           if (hasMore) Gaps.hGap5,
@@ -123,4 +121,3 @@ class MoreWidget extends StatelessWidget {
     );
   }
 }
-

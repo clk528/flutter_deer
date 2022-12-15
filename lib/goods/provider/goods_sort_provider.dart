@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_deer/generated/json/base/json_convert_content.dart';
+import 'package:flutter_deer/goods/models/goods_sort_entity.dart';
 
 class GoodsSortProvider extends ChangeNotifier {
 
@@ -9,19 +11,19 @@ class GoodsSortProvider extends ChangeNotifier {
   int get index => _index;
 
   // TabBar初始化3个，其中两个文字置空。
-  List<Tab> _myTabs = <Tab>[Tab(text: '请选择'), Tab(text: ''), Tab(text: '')];
+  final List<Tab> _myTabs = <Tab>[const Tab(text: '请选择'), const Tab(text: ''), const Tab(text: '')];
   List<Tab> get myTabs => _myTabs;
 
-  List _mGoodsSort = [];
-  List _mGoodsSort1 = [];
-  List _mGoodsSort2 = [];
+  List<GoodsSortEntity> _mGoodsSort = [];
+  List<GoodsSortEntity> _mGoodsSort1 = [];
+  List<GoodsSortEntity> _mGoodsSort2 = [];
 
   /// 当前列表数据
-  List _mList = [];
-  get mList => _mList;
+  List<GoodsSortEntity> _mList = [];
+  List<GoodsSortEntity> get mList => _mList;
 
   /// 三级联动选择的position
-  List<int> _positions = [0, 0, 0];
+  final List<int> _positions = [0, 0, 0];
   List<int> get positions => _positions;
 
 
@@ -52,12 +54,12 @@ class GoodsSortProvider extends ChangeNotifier {
     switch(index) {
       case 1:
         _mList = _mGoodsSort1;
-        _myTabs[1] = Tab(text: '请选择');
-        _myTabs[2] = Tab(text: '');
+        _myTabs[1] = const Tab(text: '请选择');
+        _myTabs[2] = const Tab(text: '');
         break;
       case 2:
         _mList = _mGoodsSort2;
-        _myTabs[2] = Tab(text: '请选择');
+        _myTabs[2] = const Tab(text: '请选择');
         break;
       case 3:
         _mList = _mGoodsSort2;
@@ -73,16 +75,16 @@ class GoodsSortProvider extends ChangeNotifier {
     }
 
     // 模拟数据，数据为固定的三个列表
-    rootBundle.loadString('assets/data/sort_0.json').then((value) {
-      _mGoodsSort = json.decode(value);
+    rootBundle.loadString('assets/data/sort_0.json').then((String value) {
+      _mGoodsSort = JsonConvert.fromJsonAsT<List<GoodsSortEntity>>(json.decode(value)) ?? [];
       _mList = _mGoodsSort;
       notifyListeners();
     });
-    rootBundle.loadString('assets/data/sort_1.json').then((value) {
-      _mGoodsSort1 = json.decode(value);
+    rootBundle.loadString('assets/data/sort_1.json').then((String value) {
+      _mGoodsSort1 = JsonConvert.fromJsonAsT<List<GoodsSortEntity>>(json.decode(value)) ?? [];
     });
-    rootBundle.loadString('assets/data/sort_2.json').then((value) {
-      _mGoodsSort2 = json.decode(value);
+    rootBundle.loadString('assets/data/sort_2.json').then((String value) {
+      _mGoodsSort2 = JsonConvert.fromJsonAsT<List<GoodsSortEntity>>(json.decode(value)) ?? [];
     });
   }
 }

@@ -11,8 +11,16 @@ if (flutterRoot == null) {
     throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
 
-def flutterVersionCode = '13'
-def flutterVersionName = '1.1.2'
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
@@ -23,7 +31,7 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 32
 
     lintOptions {
         disable 'InvalidPackage'
@@ -31,8 +39,8 @@ android {
 
     defaultConfig {
         applicationId "com.weilu.deer"
-        minSdkVersion 18
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 31
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -58,8 +66,15 @@ android {
             // #58967 gradle 4.0.0
             shrinkResources false
             zipAlignEnabled false
-            minifyEnabled false
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 }
 
@@ -68,5 +83,5 @@ flutter {
 }
 
 dependencies {
-   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }

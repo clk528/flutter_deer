@@ -1,6 +1,4 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:common_utils/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/util/image_utils.dart';
 
@@ -8,48 +6,49 @@ import 'package:flutter_deer/util/image_utils.dart';
 class LoadImage extends StatelessWidget {
   
   const LoadImage(this.image, {
-    Key key,
+    super.key,
     this.width, 
     this.height,
     this.fit = BoxFit.cover, 
     this.format = ImageFormat.png,
-    this.holderImg = 'none'
-  }): super(key: key);
+    this.holderImg = 'none',
+    this.cacheWidth,
+    this.cacheHeight,
+  });
   
   final String image;
-  final double width;
-  final double height;
+  final double? width;
+  final double? height;
   final BoxFit fit;
   final ImageFormat format;
   final String holderImg;
+  final int? cacheWidth;
+  final int? cacheHeight;
   
   @override
   Widget build(BuildContext context) {
-    if (TextUtil.isEmpty(image) || image == 'null') {
-      return LoadAssetImage(holderImg,
+
+    if (image.isEmpty || image.startsWith('http')) {
+      final Widget holder = LoadAssetImage(holderImg, height: height, width: width, fit: fit);
+      return CachedNetworkImage(
+        imageUrl: image,
+        placeholder: (_, __) => holder,
+        errorWidget: (_, __, dynamic error) => holder,
+        width: width,
+        height: height,
+        fit: fit,
+        memCacheWidth: cacheWidth,
+        memCacheHeight: cacheHeight,
+      );
+    } else {
+      return LoadAssetImage(image,
         height: height,
         width: width,
         fit: fit,
-        format: format
+        format: format,
+        cacheWidth: cacheWidth,
+        cacheHeight: cacheHeight,
       );
-    } else {
-      if (image.startsWith('http')) {
-        return CachedNetworkImage(
-          imageUrl: image,
-          placeholder: (_, __) => LoadAssetImage(holderImg, height: height, width: width, fit: fit),
-          errorWidget: (_, __, dynamic error) => LoadAssetImage(holderImg, height: height, width: width, fit: fit),
-          width: width,
-          height: height,
-          fit: fit,
-        );
-      } else {
-        return LoadAssetImage(image,
-          height: height,
-          width: width,
-          fit: fit,
-          format: format,
-        );
-      }
     }
   }
 }
@@ -58,7 +57,7 @@ class LoadImage extends StatelessWidget {
 class LoadAssetImage extends StatelessWidget {
   
   const LoadAssetImage(this.image, {
-    Key key,
+    super.key,
     this.width,
     this.height, 
     this.cacheWidth,
@@ -66,16 +65,16 @@ class LoadAssetImage extends StatelessWidget {
     this.fit,
     this.format = ImageFormat.png,
     this.color
-  }): super(key: key);
+  });
 
   final String image;
-  final double width;
-  final double height;
-  final int cacheWidth;
-  final int cacheHeight;
-  final BoxFit fit;
+  final double? width;
+  final double? height;
+  final int? cacheWidth;
+  final int? cacheHeight;
+  final BoxFit? fit;
   final ImageFormat format;
-  final Color color;
+  final Color? color;
   
   @override
   Widget build(BuildContext context) {

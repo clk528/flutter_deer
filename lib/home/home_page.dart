@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/goods/page/goods_page.dart';
 import 'package:flutter_deer/home/provider/home_provider.dart';
@@ -6,28 +5,31 @@ import 'package:flutter_deer/order/page/order_page.dart';
 import 'package:flutter_deer/res/resources.dart';
 import 'package:flutter_deer/shop/page/shop_page.dart';
 import 'package:flutter_deer/statistics/page/statistics_page.dart';
-import 'package:flutter_deer/util/double_tap_back_exit_app.dart';
 import 'package:flutter_deer/util/theme_utils.dart';
+import 'package:flutter_deer/widgets/double_tap_back_exit_app.dart';
 import 'package:flutter_deer/widgets/load_image.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
+
+  const Home({super.key});
+
   @override
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with RestorationMixin{
 
   static const double _imageSize = 25.0;
 
-  List<Widget> _pageList;
+  late List<Widget> _pageList;
   final List<String> _appBarTitles = ['订单', '商品', '统计', '店铺'];
   final PageController _pageController = PageController();
 
   HomeProvider provider = HomeProvider();
 
-  List<BottomNavigationBarItem> _list;
-  List<BottomNavigationBarItem> _listDark;
+  List<BottomNavigationBarItem>? _list;
+  List<BottomNavigationBarItem>? _listDark;
 
   @override
   void initState() {
@@ -40,19 +42,19 @@ class _HomeState extends State<Home> {
     _pageController.dispose();
     super.dispose();
   }
-  
+
   void initData() {
     _pageList = [
-      OrderPage(),
-      GoodsPage(),
-      StatisticsPage(),
-      ShopPage(),
+      const OrderPage(),
+      const GoodsPage(),
+      const StatisticsPage(),
+      const ShopPage(),
     ];
   }
 
   List<BottomNavigationBarItem> _buildBottomNavigationBarItem() {
     if (_list == null) {
-      var _tabImages = const [
+      const tabImages = [
         [
           LoadAssetImage('home/icon_order', width: _imageSize, color: Colours.unselected_item_color,),
           LoadAssetImage('home/icon_order', width: _imageSize, color: Colours.app_main,),
@@ -70,23 +72,20 @@ class _HomeState extends State<Home> {
           LoadAssetImage('home/icon_shop', width: _imageSize, color: Colours.app_main,),
         ]
       ];
-      _list = List.generate(_tabImages.length, (i) {
+      _list = List.generate(tabImages.length, (i) {
         return BottomNavigationBarItem(
-            icon: _tabImages[i][0],
-            activeIcon: _tabImages[i][1],
-            title: Padding(
-              padding: const EdgeInsets.only(top: 1.5),
-              child: Text(_appBarTitles[i], key: Key(_appBarTitles[i]),),
-            )
+          icon: tabImages[i][0],
+          activeIcon: tabImages[i][1],
+          label: _appBarTitles[i],
         );
       });
     }
-    return _list;
+    return _list!;
   }
 
   List<BottomNavigationBarItem> _buildDarkBottomNavigationBarItem() {
     if (_listDark == null) {
-      var _tabImagesDark = const [
+      const tabImagesDark = [
         [
           LoadAssetImage('home/icon_order', width: _imageSize),
           LoadAssetImage('home/icon_order', width: _imageSize, color: Colours.dark_app_main,),
@@ -105,23 +104,20 @@ class _HomeState extends State<Home> {
         ]
       ];
 
-      _listDark = List.generate(_tabImagesDark.length, (i) {
+      _listDark = List.generate(tabImagesDark.length, (i) {
         return BottomNavigationBarItem(
-            icon: _tabImagesDark[i][0],
-            activeIcon: _tabImagesDark[i][1],
-            title: Padding(
-              padding: const EdgeInsets.only(top: 1.5),
-              child: Text(_appBarTitles[i], key: Key(_appBarTitles[i]),),
-            )
+          icon: tabImagesDark[i][0],
+          activeIcon: tabImagesDark[i][1],
+          label: _appBarTitles[i],
         );
       });
     }
-    return _listDark;
+    return _listDark!;
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = ThemeUtils.isDark(context);
+    final bool isDark = context.isDark;
     return ChangeNotifierProvider<HomeProvider>(
       create: (_) => provider,
       child: DoubleTapBackExitApp(
@@ -129,7 +125,7 @@ class _HomeState extends State<Home> {
           bottomNavigationBar: Consumer<HomeProvider>(
             builder: (_, provider, __) {
               return BottomNavigationBar(
-                backgroundColor: ThemeUtils.getBackgroundColor(context),
+                backgroundColor: context.backgroundColor,
                 items: isDark ? _buildDarkBottomNavigationBarItem() : _buildBottomNavigationBarItem(),
                 type: BottomNavigationBarType.fixed,
                 currentIndex: provider.value,
@@ -153,6 +149,14 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
+  }
+
+  @override
+  String? get restorationId => 'home';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(provider, 'BottomNavigationBarCurrentIndex');
   }
 
 }

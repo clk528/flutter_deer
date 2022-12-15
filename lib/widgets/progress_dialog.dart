@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/res/resources.dart';
@@ -7,16 +6,16 @@ import 'package:flutter_deer/res/resources.dart';
 class ProgressDialog extends Dialog {
 
   const ProgressDialog({
-    Key key,
+    super.key,
     this.hintText = '',
-  }):super(key: key);
+  });
 
   final String hintText;
 
   @override
   Widget build(BuildContext context) {
     
-    Widget progress = Column(
+    final Widget progress = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Theme(

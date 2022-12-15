@@ -3,6 +3,20 @@
 
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+
+
+    <!-- Provide required visibility configuration for API level 30 and above -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+            <data android:scheme="tel" />
+        </intent>
+    </queries>
+
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
          In most cases you can leave this as-is, but you if you want to provide
@@ -21,17 +35,13 @@
             android:screenOrientation="portrait"
             android:name=".MainActivity"
             android:theme="@style/LaunchTheme"
+            android:exported="true"
             android:windowSoftInputMode="adjustResize">
-            <!-- Specify that the launch screen should continue being displayed -->
-            <!-- until Flutter renders its first frame. -->
-            <meta-data
-                android:name="io.flutter.embedding.android.SplashScreenDrawable"
-                android:resource="@drawable/launch_background" />
 
             <!-- Theme to apply as soon as Flutter begins rendering frames -->
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
-                android:resource="@android:style/Theme.Black.NoTitleBar" />
+                android:resource="@style/NormalTheme" />
             
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -42,8 +52,9 @@
 
         <meta-data
             android:name="flutterEmbedding"
-            android:value="2" />        
+            android:value="2" />
 
+        <!-- 高德地图 -->
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="29017a09c0b0279853577be7df682513"/>
@@ -58,6 +69,14 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"/>
         </provider>
-        
+
+        <meta-data android:name="android.max_aspect" android:value="2.4"/>
+        <!-- 全屏使用刘海区域-->
+        <!-- 华为 -->
+        <meta-data android:name="android.notch_support" android:value="true" />
+        <!-- 小米 Android O （https://dev.mi.com/console/doc/detail?pId=1341）-->
+        <meta-data android:name="notch.config" android:value="portrait" />
+        <!-- 其他品牌或系统版本使用官方方法，设置shortEdges-->
+
     </application>
 </manifest>

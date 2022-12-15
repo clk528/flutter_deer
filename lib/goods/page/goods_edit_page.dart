@@ -1,28 +1,36 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/goods/provider/goods_sort_provider.dart';
 import 'package:flutter_deer/goods/widgets/goods_sort_bottom_sheet.dart';
+import 'package:flutter_deer/res/resources.dart';
 import 'package:flutter_deer/routers/fluro_navigator.dart';
+import 'package:flutter_deer/util/device_utils.dart';
 import 'package:flutter_deer/util/theme_utils.dart';
-import 'package:flutter_deer/util/utils.dart';
+import 'package:flutter_deer/util/toast_utils.dart';
 import 'package:flutter_deer/widgets/click_item.dart';
 import 'package:flutter_deer/widgets/load_image.dart';
+import 'package:flutter_deer/widgets/my_app_bar.dart';
 import 'package:flutter_deer/widgets/my_button.dart';
 import 'package:flutter_deer/widgets/my_scroll_view.dart';
 import 'package:flutter_deer/widgets/selected_image.dart';
 import 'package:flutter_deer/widgets/text_field_item.dart';
-import 'package:flutter_deer/res/resources.dart';
-import 'package:flutter_deer/widgets/my_app_bar.dart';
 
 import '../goods_router.dart';
 
 /// design/4商品/index.html#artboard5
 class GoodsEditPage extends StatefulWidget {
   
-  const GoodsEditPage({Key key, this.isAdd = true, this.isScan = false}) : super(key: key);
+  const GoodsEditPage({
+    super.key,
+    this.isAdd = true,
+    this.isScan = false,
+    this.heroTag,
+    this.goodsImageUrl
+  });
   
   final bool isAdd;
   final bool isScan;
+  final String? heroTag;
+  final String? goodsImageUrl;
   
   @override
   _GoodsEditPageState createState() => _GoodsEditPageState();
@@ -30,7 +38,7 @@ class GoodsEditPage extends StatefulWidget {
 
 class _GoodsEditPageState extends State<GoodsEditPage> {
 
-  String _goodsSortName;
+  String? _goodsSortName;
   final TextEditingController _codeController = TextEditingController();
 
   @override
@@ -42,11 +50,18 @@ class _GoodsEditPageState extends State<GoodsEditPage> {
       }
     });
   }
-  
-  void _scan() async {
-    var code = await Utils.scan();
-    if (code != null) {
-      _codeController.text = code;
+
+  Future<void> _scan() async {
+    if (Device.isMobile) {
+      NavigatorUtils.unfocus();
+      // 延时保证键盘收起，否则进入扫码页会黑屏
+      Future<dynamic>.delayed(const Duration(milliseconds: 500), (){
+        NavigatorUtils.pushResult(context, GoodsRouter.qrCodeScannerPage, (Object code) {
+          _codeController.text = code.toString();
+        });
+      });
+    } else {
+      Toast.show('当前平台暂不支持');
     }
   }
   
@@ -59,6 +74,13 @@ class _GoodsEditPageState extends State<GoodsEditPage> {
       body: MyScrollView(
         key: const Key('goods_edit_page'),
         padding: const EdgeInsets.symmetric(vertical: 16.0),
+        bottomButton: Padding(
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8.0),
+          child: MyButton(
+            onPressed: () => NavigatorUtils.goBack(context),
+            text: '提交',
+          ),
+        ),
         children: <Widget>[
           Gaps.vGap5,
           const Padding(
@@ -71,6 +93,8 @@ class _GoodsEditPageState extends State<GoodsEditPage> {
           Gaps.vGap16,
           Center(
             child: SelectedImage(
+              heroTag: widget.heroTag,
+              url: widget.goodsImageUrl,
               size: 96.0,
             ),
           ),
@@ -78,19 +102,19 @@ class _GoodsEditPageState extends State<GoodsEditPage> {
           Center(
             child: Text(
               '点击添加商品图片',
-              style: Theme.of(context).textTheme.subtitle2.copyWith(fontSize: Dimens.font_sp14),
+              style: Theme.of(context).textTheme.subtitle2?.copyWith(fontSize: Dimens.font_sp14),
             ),
           ),
           Gaps.vGap16,
-          TextFieldItem(
+          const TextFieldItem(
             title: '商品名称',
             hintText: '填写商品名称',
           ),
-          TextFieldItem(
+          const TextFieldItem(
             title: '商品简介',
             hintText: '填写简短描述',
           ),
-          TextFieldItem(
+          const TextFieldItem(
             title: '折后价格',
             keyboardType: TextInputType.numberWithOptions(decimal: true),
             hintText: '填写商品单品折后价格',
@@ -108,19 +132,19 @@ class _GoodsEditPageState extends State<GoodsEditPage> {
                 child: Semantics(
                   label: '扫码',
                   child: GestureDetector(
+                    onTap: _scan,
                     child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: ThemeUtils.isDark(context) ?
+                      padding: const EdgeInsets.all(16.0),
+                      child: context.isDark ?
                         const LoadAssetImage('goods/icon_sm', width: 16.0, height: 16.0) :
                         const LoadAssetImage('goods/scanning', width: 16.0, height: 16.0),
                     ),
-                    onTap: _scan,
                   ),
                 ),
               )
             ],
           ),
-          TextFieldItem(
+          const TextFieldItem(
             title: '商品说明',
             hintText: '选填',
           ),
@@ -133,11 +157,11 @@ class _GoodsEditPageState extends State<GoodsEditPage> {
             ),
           ),
           Gaps.vGap16,
-          TextFieldItem(
+          const TextFieldItem(
             title: '立减金额',
             keyboardType: TextInputType.numberWithOptions(decimal: true)
           ),
-          TextFieldItem(
+          const TextFieldItem(
             title: '折扣金额',
             keyboardType: TextInputType.numberWithOptions(decimal: true)
           ),
@@ -162,13 +186,6 @@ class _GoodsEditPageState extends State<GoodsEditPage> {
           ),
           Gaps.vGap8,
         ],
-        bottomButton: Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 8.0),
-          child: MyButton(
-            onPressed: () => NavigatorUtils.goBack(context),
-            text: '提交',
-          ),
-        ),
       )
     );
   }

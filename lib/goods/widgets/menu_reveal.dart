@@ -7,8 +7,9 @@ import 'package:flutter/material.dart';
 class MenuReveal extends StatelessWidget {
 
   const MenuReveal({
-    this.revealPercent,
-    this.child
+    super.key,
+    required this.revealPercent,
+    required this.child
   });
 
   final double revealPercent;

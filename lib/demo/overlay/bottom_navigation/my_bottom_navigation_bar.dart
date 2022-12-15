@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 class MyBottomNavigationBar extends StatefulWidget {
 
   const MyBottomNavigationBar({
-    Key key,
+    super.key,
     this.selectedPosition = 0,
     this.isShowIndicator = true,
-    @required this.selectedCallback,
-  }) : super(key: key);
+    required this.selectedCallback,
+  });
 
   /// 选中下标
   final int selectedPosition;
@@ -42,14 +42,14 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> with Tick
 
   double itemWidth = 0;
 
-  AnimationController controller;
-  Animation<double> animation;
+  late AnimationController controller;
+  late Animation<double> animation;
   
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      itemWidth = (context.size.width - barHeight) / 3;
+      itemWidth = (context.size!.width - barHeight) / 3;
       setState(() {});
     });
     
@@ -66,16 +66,16 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> with Tick
 
   @override
   Widget build(BuildContext context) {
-    var children = <Widget>[];
+    final children = <Widget>[];
     
     /// 背景
-    var background = Container(
+    final background = Container(
       height: barHeight,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(barHeight / 2),
         boxShadow: const [
-          BoxShadow(color: Colors.grey, offset: Offset(0.0, 1.0), blurRadius: 4.0, spreadRadius: 0.0),
+          BoxShadow(color: Colors.grey, offset: Offset(0.0, 1.0), blurRadius: 4.0),
         ],
       ),
     );
@@ -89,31 +89,32 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> with Tick
     if (widget.isShowIndicator) {
       /// 指示器
       children.add(Positioned(
+        left: 6.0 + animation.value * itemWidth,
+        top: (barHeight - indicatorHeight) / 2,
         child: Container(
           width: indicatorHeight,
           height: indicatorHeight,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.white,
-            boxShadow: const [
-              BoxShadow(color: Colors.grey, offset: Offset(0.0, 0.0), blurRadius: 1.0, spreadRadius: 0.0),
+            boxShadow: [
+              BoxShadow(color: Colors.grey, blurRadius: 1.0),
             ],
           ),
         ),
-        left: 6.0 + animation.value * itemWidth,
-        top: (barHeight - indicatorHeight) / 2,
       ));
     }
 
     for (var i = 0; i < iconList.length; i++) {
       /// 图标中心点计算
-      var rect = Rect.fromCenter(
+      final rect = Rect.fromCenter(
         center: Offset(28.0 + (i * itemWidth), 28.0),
         width: (i == selectedPosition && widget.isShowIndicator) ? selectedIconHeight : normalIconHeight,
         height: (i == selectedPosition && widget.isShowIndicator) ? selectedIconHeight : normalIconHeight,
       );
 
       children.add(Positioned.fromRect(
+        rect: rect,
         child: GestureDetector(
           child: Container(
             decoration: BoxDecoration(
@@ -126,7 +127,6 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> with Tick
             _selectedPosition(i);
           },
         ),
-        rect: rect,
       ));
     }
     
@@ -148,9 +148,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> with Tick
     });
     controller.forward(from: 0.0);
     
-    if (widget.selectedCallback != null) {
-      widget.selectedCallback(selectedPosition);
-    }
+    widget.selectedCallback(selectedPosition);
   }
 
   @override

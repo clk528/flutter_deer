@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_deer/res/resources.dart';
 
 /// 间隔
+/// 官方做法：https://github.com/flutter/flutter/pull/54394
 class Gaps {
   
   /// 水平间隔
@@ -42,4 +42,7 @@ class Gaps {
   );
   
   static const Widget empty = SizedBox.shrink();
+
+  /// 补充一种空Widget实现 https://github.com/letsar/nil
+  /// https://github.com/flutter/flutter/issues/78159
 }

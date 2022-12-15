@@ -3,56 +3,40 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_deer/res/resources.dart';
 import 'package:flutter_deer/util/theme_utils.dart';
+import 'package:flutter_deer/widgets/my_button.dart';
 
 /// 自定义AppBar
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   const MyAppBar({
-    Key key,
+    super.key,
     this.backgroundColor,
     this.title = '',
     this.centerTitle = '',
     this.actionName = '',
     this.backImg = 'assets/images/ic_back_black.png',
+    this.backImgColor,
     this.onPressed,
     this.isBack = true
-  }): super(key: key);
+  });
 
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final String title;
   final String centerTitle;
   final String backImg;
+  final Color? backImgColor;
   final String actionName;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isBack;
 
   @override
   Widget build(BuildContext context) {
-    Color _backgroundColor;
+    final Color bgColor = backgroundColor ?? context.backgroundColor;
 
-    if (backgroundColor == null) {
-      _backgroundColor = ThemeUtils.getBackgroundColor(context);
-    } else {
-      _backgroundColor = backgroundColor;
-    }
-
-    final SystemUiOverlayStyle _overlayStyle = ThemeData.estimateBrightnessForColor(_backgroundColor) == Brightness.dark
+    final SystemUiOverlayStyle overlayStyle = ThemeData.estimateBrightnessForColor(bgColor) == Brightness.dark
         ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark;
 
-    Widget back = isBack ? IconButton(
-      onPressed: () {
-        FocusManager.instance.primaryFocus?.unfocus();
-        Navigator.maybePop(context);
-      },
-      tooltip: 'Back',
-      padding: const EdgeInsets.all(12.0),
-      icon: Image.asset(
-        backImg,
-        color: ThemeUtils.getIconColor(context),
-      ),
-    ) : Gaps.empty;
-
-    Widget action = actionName.isNotEmpty ? Positioned(
+    final Widget action = actionName.isNotEmpty ? Positioned(
       right: 0.0,
       child: Theme(
         data: Theme.of(context).copyWith(
@@ -61,33 +45,52 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
             minWidth: 60.0,
           ),
         ),
-        child: FlatButton(
-          child: Text(actionName, key: const Key('actionName')),
-          textColor: ThemeUtils.isDark(context) ? Colours.dark_text : Colours.text,
-          highlightColor: Colors.transparent,
+        child: MyButton(
+          key: const Key('actionName'),
+          fontSize: Dimens.font_sp14,
+          minWidth: null,
+          text: actionName,
+          textColor: context.isDark ? Colours.dark_text : Colours.text,
+          backgroundColor: Colors.transparent,
           onPressed: onPressed,
         ),
       ),
     ) : Gaps.empty;
 
-    Widget titleWidget = Semantics(
+    final Widget back = isBack ? IconButton(
+      onPressed: () async {
+        FocusManager.instance.primaryFocus?.unfocus();
+        final isBack = await Navigator.maybePop(context);
+        if (!isBack) {
+          await SystemNavigator.pop();
+        }
+      },
+      tooltip: 'Back',
+      padding: const EdgeInsets.all(12.0),
+      icon: Image.asset(
+        backImg,
+        color: backImgColor ?? ThemeUtils.getIconColor(context),
+      ),
+    ) : Gaps.empty;
+
+    final Widget titleWidget = Semantics(
       namesRoute: true,
       header: true,
       child: Container(
         alignment: centerTitle.isEmpty ? Alignment.centerLeft : Alignment.center,
         width: double.infinity,
+        margin: const EdgeInsets.symmetric(horizontal: 48.0),
         child: Text(
           title.isEmpty ? centerTitle : title,
-          style: TextStyle(fontSize: Dimens.font_sp18,),
+          style: const TextStyle(fontSize: Dimens.font_sp18,),
         ),
-        margin: const EdgeInsets.symmetric(horizontal: 48.0),
       ),
     );
     
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: _overlayStyle,
+      value: overlayStyle,
       child: Material(
-        color: _backgroundColor,
+        color: bgColor,
         child: SafeArea(
           child: Stack(
             alignment: Alignment.centerLeft,

@@ -1,27 +1,25 @@
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_deer/res/resources.dart';
-import 'package:flutter_deer/util/number_text_input_formatter.dart';
+import 'package:flutter_deer/util/input_formatter/number_text_input_formatter.dart';
 
 /// 封装输入框
 class TextFieldItem extends StatelessWidget {
 
   const TextFieldItem({
-    Key key,
+    super.key,
     this.controller,
-    @required this.title,
+    required this.title,
     this.keyboardType = TextInputType.text,
     this.hintText = '',
     this.focusNode,
-  }): super(key: key);
+  });
 
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final String title;
   final String hintText;
   final TextInputType keyboardType;
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -63,12 +61,12 @@ class TextFieldItem extends StatelessWidget {
     );
   }
 
-  List<TextInputFormatter> _getInputFormatters() {
+  List<TextInputFormatter>? _getInputFormatters() {
     if (keyboardType == const TextInputType.numberWithOptions(decimal: true)) {
-      return [UsNumberTextInputFormatter()];
+      return <TextInputFormatter>[UsNumberTextInputFormatter()];
     }
     if (keyboardType == TextInputType.number || keyboardType == TextInputType.phone) {
-      return [WhitelistingTextInputFormatter.digitsOnly];
+      return <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly];
     }
     return null;
   }

@@ -1,17 +1,19 @@
-
 import 'package:common_utils/common_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/account/widgets/rise_number_text.dart';
 import 'package:flutter_deer/res/resources.dart';
 import 'package:flutter_deer/routers/fluro_navigator.dart';
 import 'package:flutter_deer/util/image_utils.dart';
-import 'package:flutter_deer/widgets/my_app_bar.dart';
 import 'package:flutter_deer/widgets/click_item.dart';
+import 'package:flutter_deer/widgets/my_app_bar.dart';
 
 import '../account_router.dart';
 
 /// design/6店铺-账户/index.html#artboard2
 class AccountPage extends StatefulWidget {
+
+  const AccountPage({super.key});
+
   @override
   _AccountPageState createState() => _AccountPageState();
 }
@@ -65,13 +67,13 @@ class _AccountPageState extends State<AccountPage> {
               title: '当前余额(元)',
               money: '30.12',
               alignment: MainAxisAlignment.end,
-              moneyTextStyle: const TextStyle(color: Colors.white, fontSize: 32.0, fontWeight: FontWeight.bold, fontFamily: 'RobotoThin'),
+              moneyTextStyle: TextStyle(color: Colors.white, fontSize: 32.0, fontWeight: FontWeight.bold, fontFamily: 'RobotoThin'),
             ),
             Expanded(
               child: Row(
-                children: <Widget>[
-                  const _AccountMoney(title: '累计结算金额', money: '20000'),
-                  const _AccountMoney(title: '累计发放佣金', money: '0.02'),
+                children: const <Widget>[
+                  _AccountMoney(title: '累计结算金额', money: '20000'),
+                  _AccountMoney(title: '累计发放佣金', money: '0.02'),
                 ],
               ),
             ),
@@ -85,17 +87,16 @@ class _AccountPageState extends State<AccountPage> {
 class _AccountMoney extends StatelessWidget {
   
   const _AccountMoney({
-    Key key,
-    @required this.title,
-    @required this.money,
+    required this.title,
+    required this.money,
     this.alignment,
     this.moneyTextStyle
-  }): super(key: key);
+  });
 
   final String title;
   final String money;
-  final MainAxisAlignment alignment;
-  final TextStyle moneyTextStyle;
+  final MainAxisAlignment? alignment;
+  final TextStyle? moneyTextStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -106,11 +107,11 @@ class _AccountMoney extends StatelessWidget {
           children: <Widget>[
             /// 横向撑开Column，扩大语义区域
             const SizedBox(width: double.infinity),
-            Text(title, style: TextStyle(color: Colours.text_disabled, fontSize: Dimens.font_sp12)),
+            Text(title, style: const TextStyle(color: Colours.text_disabled, fontSize: Dimens.font_sp12)),
             Gaps.vGap8,
             RiseNumberText(
-              NumUtil.getDoubleByValueStr(money),
-              style: moneyTextStyle ?? TextStyle(
+              NumUtil.getDoubleByValueStr(money) ?? 0,
+              style: moneyTextStyle ?? const TextStyle(
                 color: Colours.text_disabled, 
                 fontSize: Dimens.font_sp14,
                 fontWeight: FontWeight.bold,

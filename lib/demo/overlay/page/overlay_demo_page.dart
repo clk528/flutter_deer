@@ -11,13 +11,15 @@ import 'package:flutter_deer/demo/overlay/route/application.dart';
 /// 本例包含自定义BottomNavigationBar，路由监听及Overlay悬浮用法。
 class OverlayDemoPage extends StatefulWidget {
 
+  const OverlayDemoPage({super.key});
+
   @override
   _OverlayDemoPageState createState() => _OverlayDemoPageState();
 }
 
 class _OverlayDemoPageState extends State<OverlayDemoPage> {
 
-  OverlayEntry _overlayEntry;
+  OverlayEntry? _overlayEntry;
 
   @override
   void initState() {
@@ -27,7 +29,7 @@ class _OverlayDemoPageState extends State<OverlayDemoPage> {
         builder: (context) => _buildBottomNavigation(context),
       );
       /// 添加悬浮
-      Overlay.of(context).insert(_overlayEntry);
+      Overlay.of(context)?.insert(_overlayEntry!);
     });
   }
   
@@ -43,7 +45,7 @@ class _OverlayDemoPageState extends State<OverlayDemoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Overlay Demo'),
+        title: const Text('Overlay Demo'),
       ),
       body: Container(
         color: Colors.amber,
@@ -59,7 +61,7 @@ class _OverlayDemoPageState extends State<OverlayDemoPage> {
               Navigator.push<TestPage>(
                 context,
                 MaterialPageRoute<TestPage>(
-                  builder: (BuildContext context) => TestPage(),
+                  builder: (BuildContext context) => const TestPage(),
                 ),
               );
             },
@@ -70,7 +72,7 @@ class _OverlayDemoPageState extends State<OverlayDemoPage> {
   } 
   
   Widget _buildBottomNavigation(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
+    final double width = MediaQuery.of(context).size.width;
     return Positioned(
       left: width * 0.2,
       right: width * 0.2,
@@ -81,9 +83,10 @@ class _OverlayDemoPageState extends State<OverlayDemoPage> {
           isShowIndicator: Application.navigatorObserver.list.isEmpty,
           selectedCallback: (position) {
             /// 返回主页
-            Application.navigatorObserver.list.forEach((route) {
+            void removeRoute(Route<dynamic> route) {
               Navigator.removeRoute(context, route);
-            });
+            }
+            Application.navigatorObserver.list.forEach(removeRoute);
             /// 手动清空
             Application.navigatorObserver.list = [];
           },

@@ -1,22 +1,20 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_deer/routers/fluro_navigator.dart';
-import 'package:flutter_deer/util/number_text_input_formatter.dart';
+import 'package:flutter_deer/util/input_formatter/number_text_input_formatter.dart';
 import 'package:flutter_deer/util/theme_utils.dart';
-import 'package:flutter_deer/util/toast.dart';
+import 'package:flutter_deer/util/toast_utils.dart';
 import 'package:flutter_deer/widgets/base_dialog.dart';
 
 /// design/7店铺-店铺配置/index.html#artboard1
 class RangePriceInputDialog extends StatefulWidget {
 
-  RangePriceInputDialog({
-    Key key,
+  const RangePriceInputDialog({
+    super.key,
     this.title,
-    this.onPressed,
-  }) : super(key : key);
+    required this.onPressed,
+  });
 
-  final String title;
+  final String? title;
   final Function(String, String) onPressed;
   
   @override
@@ -50,43 +48,17 @@ class _RangePriceInputDialog extends State<RangePriceInputDialog> {
         child: Row(
           children: <Widget>[
             Expanded(
-              child: TextField(
-                autofocus: true,
-                //style: TextStyles.textDark14,
-                controller: _controller,
-                maxLines: 1,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                // 金额限制数字格式
-                inputFormatters: [UsNumberTextInputFormatter()],
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.only(top: 0.0, left: 16.0, right: 16.0, bottom: 14.0),
-                  border: InputBorder.none,
-                  //hintStyle: TextStyles.textGray14,
-                ),
-              ),
+              child: _buildTextField(_controller),
             ),
             Container(
               alignment: Alignment.center,
-              child: const Text('至'),
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              color: ThemeUtils.getDialogBackgroundColor(context),
-              height: double.infinity
+              color: context.dialogBackgroundColor,
+              height: double.infinity,
+              child: const Text('至')
             ),
             Expanded(
-              child: TextField(
-                autofocus: true,
-                //style: TextStyles.textDark14,
-                controller: _controller1,
-                maxLines: 1,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                // 金额限制数字格式
-                inputFormatters: [UsNumberTextInputFormatter()],
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.only(top: 0.0, left: 16.0, right: 16.0, bottom: 14.0),
-                  border: InputBorder.none,
-                  //hintStyle: TextStyles.textGray14,
-                ),
-              ),
+              child: _buildTextField(_controller1),
             ),
           ],
         ),
@@ -103,6 +75,23 @@ class _RangePriceInputDialog extends State<RangePriceInputDialog> {
         NavigatorUtils.goBack(context);
         widget.onPressed(_controller.text, _controller1.text);
       },
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller) {
+    return TextField(
+      autofocus: true,
+      //style: TextStyles.textDark14,
+      controller: controller,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      // 金额限制数字格式
+      inputFormatters: [UsNumberTextInputFormatter()],
+      decoration: const InputDecoration(
+        isDense: true,
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+        border: InputBorder.none,
+        //hintStyle: TextStyles.textGray14,
+      ),
     );
   }
 }

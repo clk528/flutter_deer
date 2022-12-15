@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/order/provider/order_page_provider.dart';
 import 'package:flutter_deer/order/widgets/order_item.dart';
@@ -11,9 +10,9 @@ import 'package:provider/provider.dart';
 class OrderListPage extends StatefulWidget {
 
   const OrderListPage({
-    Key key,
-    @required this.index,
-  }): super(key: key);
+    super.key,
+    required this.index,
+  });
 
   final int index;
   
@@ -24,7 +23,7 @@ class OrderListPage extends StatefulWidget {
 class _OrderListPageState extends State<OrderListPage> with AutomaticKeepAliveClientMixin<OrderListPage>, ChangeNotifierMixin<OrderListPage>{
 
   final ScrollController _controller = ScrollController();
-  StateType _stateType = StateType.loading;
+  final StateType _stateType = StateType.loading;
   /// 是否正在加载数据
   bool _isLoading = false;
   final int _maxPage = 3;
@@ -40,7 +39,7 @@ class _OrderListPageState extends State<OrderListPage> with AutomaticKeepAliveCl
   }
 
   @override
-  Map<ChangeNotifier, List<VoidCallback>> changeNotifier() {
+  Map<ChangeNotifier, List<VoidCallback>?>? changeNotifier() {
     return {_controller: null};
   }
   
@@ -69,7 +68,7 @@ class _OrderListPageState extends State<OrderListPage> with AutomaticKeepAliveCl
                   ///SliverAppBar的expandedHeight高度,避免重叠
                   handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                 ),
-                child,
+                child!,
               ],
             );
           },
@@ -80,7 +79,7 @@ class _OrderListPageState extends State<OrderListPage> with AutomaticKeepAliveCl
               delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
                 return index < _list.length ? 
                 (index % 5 == 0 ? 
-                    OrderTagItem(date: '2020年2月5日', orderTotal: 4) :
+                    const OrderTagItem(date: '2021年2月5日', orderTotal: 4) :
                     OrderItem(key: Key('order_item_$index'), index: index, tabIndex: _index,)
                 ) : 
                 MoreWidget(_list.length, _hasMore(), 10);

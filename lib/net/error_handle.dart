@@ -1,10 +1,11 @@
 import 'dart:io';
-
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 class ExceptionHandle {
   static const int success = 200;
   static const int success_not_content = 204;
+  static const int not_modified = 304;
   static const int unauthorized = 401;
   static const int forbidden = 403;
   static const int not_found = 404;
@@ -19,7 +20,7 @@ class ExceptionHandle {
   static const int cancel_error = 1007;
   static const int unknown_error = 9999;
 
-  static Map<int, NetError> _errorMap = <int, NetError>{
+  static final Map<int, NetError> _errorMap = <int, NetError>{
     net_error             :   NetError(net_error, '网络异常，请检查你的网络！'),
     parse_error           :   NetError(parse_error, '数据解析错误！'),
     socket_error          :   NetError(socket_error, '网络异常，请检查你的网络！'),
@@ -32,12 +33,12 @@ class ExceptionHandle {
   };
 
   static NetError handleException(dynamic error) {
-    print(error);
+    debugPrint(error.toString());
     if (error is DioError) {
       if (error.type.errorCode == 0) {
         return _handleException(error.error);
       } else {
-        return _errorMap[error.type.errorCode];
+        return _errorMap[error.type.errorCode]!;
       }
     } else {
       return _handleException(error);
@@ -55,15 +56,16 @@ class ExceptionHandle {
     if (error is FormatException) {
       errorCode = parse_error;
     }
-    return _errorMap[errorCode];
+    return _errorMap[errorCode]!;
   }
 }
 
 class NetError{
-  int code;
-  String msg;
 
   NetError(this.code, this.msg);
+
+  int code;
+  String msg;
 }
 
 extension DioErrorTypeExtension on DioErrorType {

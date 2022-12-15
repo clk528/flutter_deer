@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/routers/fluro_navigator.dart';
 import 'package:flutter_deer/util/theme_utils.dart';
@@ -8,11 +7,11 @@ import 'package:flutter_deer/widgets/base_dialog.dart';
 class GoodsSizeDialog extends StatefulWidget {
 
   const GoodsSizeDialog({
-    Key key,
+    super.key,
     this.onPressed,
-  }) : super(key : key);
+  });
 
-  final Function(String) onPressed;
+  final Function(String)? onPressed;
   
   @override
   _GoodsSizeDialog createState() => _GoodsSizeDialog();
@@ -44,10 +43,9 @@ class _GoodsSizeDialog extends State<GoodsSizeDialog> {
         child: TextField(
           autofocus: true,
           controller: _controller,
-          maxLines: 1,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             isDense: true,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
             border: InputBorder.none,
             hintText: '输入文字…',
             //hintStyle: TextStyles.textGrayC14,
@@ -56,7 +54,7 @@ class _GoodsSizeDialog extends State<GoodsSizeDialog> {
       ),
       onPressed: () {
         NavigatorUtils.goBack(context);
-        widget.onPressed(_controller.text);
+        widget.onPressed?.call(_controller.text);
       },
     );
   }

@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/res/resources.dart';
 import 'package:flutter_deer/widgets/my_app_bar.dart';
@@ -8,6 +6,9 @@ import 'package:flutter_deer/widgets/my_scroll_view.dart';
 
 /// design/3订单/index.html#artboard10
 class OrderTrackPage extends StatefulWidget {
+
+  const OrderTrackPage({super.key});
+
   @override
   _OrderTrackPageState createState() => _OrderTrackPageState();
 }
@@ -30,7 +31,7 @@ class _OrderTrackPageState extends State<OrderTrackPage> {
                 // 可选择文本组件（复制）
                 Semantics(
                   label: '长按复制订单编号',
-                  child: SelectableText('14562364879', maxLines: 1,),
+                  child: const SelectableText('14562364879', maxLines: 1,),
                 ),
               ],
             )
@@ -38,7 +39,9 @@ class _OrderTrackPageState extends State<OrderTrackPage> {
           Stepper(
             physics: const BouncingScrollPhysics(),
             currentStep: 4 - 1,
-            controlsBuilder: (_, {onStepContinue, onStepCancel}) {
+            // flutter 2.8.0以下使用：
+            // controlsBuilder: (_, {onStepContinue, onStepCancel}) {
+            controlsBuilder: (_, __) {
               return Gaps.empty; //操作按钮置空
             },
             steps: List.generate(4, (i) => _buildStep(i)),
@@ -67,7 +70,7 @@ class _OrderTrackPageState extends State<OrderTrackPage> {
       ) : Theme.of(context).textTheme.subtitle2),
       content: const Text(''),
       isActive: index == 0,
-      // TODO 这里的状态图标无法修改，暂时使用原生的。应该可以复制Step代码修改一下。
+      // TODO(weilu): 这里的状态图标无法修改，暂时使用原生的。应该可以复制Step代码修改一下。
       state: index == 0 ? StepState.complete : StepState.indexed, 
     );
   }

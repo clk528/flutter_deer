@@ -1,20 +1,19 @@
-
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/account/models/withdrawal_account_model.dart';
 import 'package:flutter_deer/res/resources.dart';
 import 'package:flutter_deer/util/theme_utils.dart';
-import 'package:flutter_deer/util/toast.dart';
+import 'package:flutter_deer/util/toast_utils.dart';
 import 'package:flutter_deer/widgets/load_image.dart';
 
 class WithdrawalAccountItem extends StatefulWidget {
 
   const WithdrawalAccountItem({
-    Key key,
-    @required this.data,
-    this.onLongPress,
-  }): super(key: key);
+    super.key,
+    required this.data,
+    required this.onLongPress,
+  });
   
   final WithdrawalAccountModel data;
   final GestureLongPressCallback onLongPress;
@@ -26,14 +25,14 @@ class WithdrawalAccountItem extends StatefulWidget {
 /// 3D翻转动画 https://medium.com/flutterpub/flutter-flip-card-animation-with-3d-effect-4284af04f5a
 class _WithdrawalAccountItemState extends State<WithdrawalAccountItem> with SingleTickerProviderStateMixin {
 
-  AnimationController _animationController;
-  Animation<double> _animation;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
   AnimationStatus _animationStatus = AnimationStatus.dismissed;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _animationController = AnimationController(vsync: this, duration: const Duration(seconds: 1));
     _animation = Tween<double>(end: 1.0, begin: 0).animate(_animationController)
       ..addStatusListener((status) {
         _animationStatus = status;
@@ -48,7 +47,7 @@ class _WithdrawalAccountItemState extends State<WithdrawalAccountItem> with Sing
   
   @override
   Widget build(BuildContext context) {
-    var front = Stack(
+    final Widget front = Stack(
       children: <Widget>[
         Positioned(
           top: 25.0,
@@ -67,22 +66,22 @@ class _WithdrawalAccountItemState extends State<WithdrawalAccountItem> with Sing
         Positioned(
           top: 22.0,
           left: 72.0,
-          child: Text(widget.data.typeName, style: TextStyle(color: Colors.white, fontSize: Dimens.font_sp18)),
+          child: Text(widget.data.typeName, style: const TextStyle(color: Colors.white, fontSize: Dimens.font_sp18)),
         ),
         Positioned(
           top: 48.0,
           left: 72.0,
-          child: Text(widget.data.name, style: TextStyle(color: Colors.white, fontSize: Dimens.font_sp12)),
+          child: Text(widget.data.name, style: const TextStyle(color: Colors.white, fontSize: Dimens.font_sp12)),
         ),
         Positioned(
           bottom: 24.0,
           left: 72.0,
-          child: Text(widget.data.code, style: TextStyle(color: Colors.white, fontSize: Dimens.font_sp18, letterSpacing: 1.0)),
+          child: Text(widget.data.code, style: const TextStyle(color: Colors.white, fontSize: Dimens.font_sp18, letterSpacing: 1.0)),
         ),
       ],
     );
     
-    var back = Center(
+    final Widget back = Center(
       child: GestureDetector(
         onTap: () => Toast.show('提现'),
         child: Container(
@@ -97,7 +96,7 @@ class _WithdrawalAccountItemState extends State<WithdrawalAccountItem> with Sing
             transform: Matrix4.identity()
               ..setEntry(3, 2, 0.002)
               ..rotateX(pi),
-            child: Text('提现',
+            child: const Text('提现',
                 style: TextStyle(color: Colors.white, fontSize: Dimens.font_sp16)
             ),
           ),
@@ -124,7 +123,7 @@ class _WithdrawalAccountItemState extends State<WithdrawalAccountItem> with Sing
                   /// 避免动画中重复执行
                   if (_animationStatus == AnimationStatus.dismissed) {
                     _animationController.forward();
-                  } 
+                  }
                   if (_animationStatus == AnimationStatus.completed) {
                     _animationController.reverse();
                   }
@@ -142,10 +141,10 @@ class _WithdrawalAccountItemState extends State<WithdrawalAccountItem> with Sing
 class AccountCard extends StatefulWidget {
 
   const AccountCard({
-    Key key,
-    @required this.child,
-    this.type
-  }): super(key: key);
+    super.key,
+    required this.child,
+    required this.type
+  });
 
   final Widget child;
   final int type;
@@ -157,23 +156,26 @@ class AccountCard extends StatefulWidget {
 class _AccountCardState extends State<AccountCard> {
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
-        boxShadow: ThemeUtils.isDark(context) ?
-        null :
-        [
-          BoxShadow(color: widget.type == 1 ?
-          const Color(0x804EE07A) :
-          const Color(0x805793FA), offset: Offset(0.0, 2.0), blurRadius: 8.0, spreadRadius: 0.0),
-        ],
-        gradient: LinearGradient(
-          colors: widget.type == 1 ?
-          const [Color(0xFF40E6AE), Color(0xFF2DE062)] :
-          const [Color(0xFF57C4FA), Colours.app_main],
+    /// 添加RepaintBoundary原因见docs/Web问题汇总.md
+    return RepaintBoundary(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: context.isDark ? null : [
+            BoxShadow(
+              color: widget.type == 1 ? const Color(0x804EE07A) : Colours.shadow_blue,
+              offset: const Offset(0.0, 2.0),
+              blurRadius: 8.0,
+            ),
+          ],
+          gradient: LinearGradient(
+            colors: widget.type == 1 ?
+            const [Color(0xFF40E6AE), Color(0xFF2DE062)] :
+            const [Color(0xFF57C4FA), Colours.app_main],
+          ),
         ),
+        child: widget.child,
       ),
-      child: widget.child,
     );
   }
 }

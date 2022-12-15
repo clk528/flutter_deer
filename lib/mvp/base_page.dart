@@ -1,16 +1,14 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_deer/mvp/base_presenter.dart';
 import 'package:flutter_deer/routers/fluro_navigator.dart';
 import 'package:flutter_deer/util/log_utils.dart';
-import 'package:flutter_deer/util/toast.dart';
-import 'package:flutter_deer/util/utils.dart';
+import 'package:flutter_deer/util/toast_utils.dart';
 import 'package:flutter_deer/widgets/progress_dialog.dart';
 import 'mvps.dart';
 
 mixin BasePageMixin<T extends StatefulWidget, P extends BasePresenter> on State<T> implements IMvpView {
 
-  P presenter;
+  P? presenter;
 
   P createPresenter();
   
@@ -35,9 +33,10 @@ mixin BasePageMixin<T extends StatefulWidget, P extends BasePresenter> on State<
     if (mounted && !_isShowDialog) {
       _isShowDialog = true;
       try {
-        showTransparentDialog<void>(
+        showDialog<void>(
           context: context,
           barrierDismissible: false,
+          barrierColor: const Color(0x00FFFFFF), // 默认dialog背景色为半透明黑色，这里修改为透明（1.20添加属性）
           builder:(_) {
             return WillPopScope(
               onWillPop: () async {
@@ -51,7 +50,7 @@ mixin BasePageMixin<T extends StatefulWidget, P extends BasePresenter> on State<
         );
       } catch(e) {
         /// 异常原因主要是页面没有build完成就调用Progress。
-        print(e);
+        debugPrint(e.toString());
       }
     }
   }
